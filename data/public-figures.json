@@ -12,7 +12,16 @@
   "public_t1_bytes": 393372,
   "public_t1_percent": 13.752,
   "strict_scope_bytes": 3827976,
-  "t2": "not measured (no whole-module build yet)",
+  "t2": {
+   "image_bytes": 4085872,
+   "image_identical": true,
+   "image_t2_bytes": 394236,
+   "image_t2_percent": 9.649,
+   "method": "tools/lbpbuild.py public build: bytes the compiled objects of published accepted sources produce in the whole-module image, which is byte-identical to the retail module; scaffolding never counts",
+   "public_t2_bytes": 393372,
+   "public_t2_data_bytes": 864,
+   "public_t2_percent": 13.752
+  },
   "t3": "not measured"
  }
 }

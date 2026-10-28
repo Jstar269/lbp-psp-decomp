@@ -24,9 +24,12 @@ file is edited.
 Public figures follow hst-decomp's rule (docs/COMPLETION.md): Sony code kept out of the public tree is not counted in
 the public denominator; it stays in the strict scope. Public scope = the game region and the libstdc++ region of
 data/origin-regions.json plus every function a published open-source source covers, minus the functions whose
-matched source is held back (Sony code by its class, wherever it sits). Numerator = bytes owned by
-accepted proofs (data/accepted-ledger.jsonl, tools/lbpproof.py) whose source is published. Only tier T1 exists so far
-(no whole-module build yet).
+matched source is held back (Sony code by its class, wherever it sits). T1 numerator = bytes owned by accepted proofs
+(data/accepted-ledger.jsonl, tools/lbpproof.py) whose source is published. T2 (the whole-module build,
+tools/lbpbuild.py) is read from the public build's report (build/whole/<module>/public/report.json) and counted only
+when that build was byte-identical to the retail module and made from the current accepted ledger: public_t2_bytes =
+the code bytes of the public scope that published sources produce in that identical image (strict: scaffolding never
+counts); the data bytes they produce and their share of the whole image are given beside it. T3 is not measured.
 
 --audit scans a built tree for: machine or private paths and user names; key-like material; source files whose
 class is not publishable or that ORIGINS.json does not list; files the policy excludes. It also counts, without
@@ -39,6 +42,7 @@ This tool never touches a git remote and never uses the network: the only git co
 from __future__ import annotations
 
 import argparse
+import bisect
 import json
 import os
 import re
@@ -136,9 +140,46 @@ def functions(root: Path, module: str) -> dict[int, int]:
     return {f["start"]: f["end"] for f in mod["functions"]} if mod else {}
 
 
+def overlap_bytes(ranges: list[tuple[int, int]], scope: list[tuple[int, int]]) -> int:
+    """Bytes of `ranges` inside `scope` (both lists of [start, end); `scope` sorted and disjoint)."""
+    starts = [a for a, _b in scope]
+    total = 0
+    for s, e in ranges:
+        k = max(bisect.bisect_right(starts, s) - 1, 0)
+        while k < len(scope) and scope[k][0] < e:
+            total += max(0, min(e, scope[k][1]) - max(s, scope[k][0]))
+            k += 1
+    return total
+
+
+def public_t2(report: dict, kept_sources: set[str], scope: list[tuple[int, int]], scope_bytes: int) -> dict:
+    """The public T2 figures of one module from its public whole-module build report (tools/lbpbuild.py load_report:
+    identical image, current ledger): code bytes of the public scope that published sources produce, their data bytes,
+    and their share of the whole image."""
+    code: list[tuple[int, int]] = []
+    data = image = 0
+    for path, rows in report.get("t2_source_ranges", {}).items():
+        if path not in kept_sources:
+            continue
+        image += report["t2_source_bytes"].get(path, 0)
+        for start, end, kind in rows:
+            s, e = int(start, 16), int(end, 16)
+            if kind == "source-code":
+                code.append((s, e))
+            else:
+                data += e - s
+    done = overlap_bytes(sorted(code), scope)
+    return {"public_t2_bytes": done, "public_t2_percent": round(100.0 * done / scope_bytes, 3) if scope_bytes else 0.0,
+            "public_t2_data_bytes": data, "image_bytes": report["image_bytes"], "image_identical": True,
+            "image_t2_bytes": image, "image_t2_percent": round(100.0 * image / report["image_bytes"], 3),
+            "method": "tools/lbpbuild.py public build: bytes the compiled objects of published accepted sources produce "
+                      "in the whole-module image, which is byte-identical to the retail module; scaffolding never counts"}
+
+
 def figures(kept_sources: set[str], classes: dict[str, str], regions: dict, inventory: dict[str, dict[int, int]],
-            proofs: list[dict]) -> dict:
-    """Public T1 figures (see the module docstring) per module, from the inventory and the accepted proofs."""
+            proofs: list[dict], t2_reports: dict[str, dict | str] | None = None) -> dict:
+    """Public T1 figures (see the module docstring) per module, from the inventory and the accepted proofs, and T2 from
+    `t2_reports` ({module: public build report, or the reason there is none}; tools/lbpbuild.py load_report)."""
     out = {}
     published_open = defaultdict(set)   # module -> starts covered by published open-source sources
     owned = defaultdict(dict)           # module -> {start: (end, source)} for proofs of published sources
@@ -161,11 +202,14 @@ def figures(kept_sources: set[str], classes: dict[str, str], regions: dict, inve
         by_region = defaultdict(int)
         for s, e in inv.items():
             by_region[lbporigin.region_class(regions, module, s)] += e - s
+        rep = (t2_reports or {}).get(module, "not measured (no whole-module build report)")
+        t2 = public_t2(rep, kept_sources, sorted((s, inv[s]) for s in scope), scope_bytes) if isinstance(rep, dict) \
+            else rep
         out[module] = {"code_bytes": total, "public_scope_bytes": scope_bytes,
                        "public_t1_bytes": done, "public_t1_percent": round(100.0 * done / scope_bytes, 3)
                        if scope_bytes else 0.0,
                        "strict_scope_bytes": total, "code_bytes_by_region_class": dict(sorted(by_region.items())),
-                       "t2": "not measured (no whole-module build yet)", "t3": "not measured"}
+                       "t2": t2, "t3": "not measured"}
     return out
 
 
@@ -199,7 +243,10 @@ def build(out: Path, list_all: bool) -> int:
     inventory = {m: functions(ROOT, m) for m in regions}
     ledger = ROOT / "data" / "accepted-ledger.jsonl"
     proofs = [json.loads(ln) for ln in ledger.read_text(encoding="utf-8").splitlines()[1:]] if ledger.exists() else []
-    figs = figures({p for p in kept_classes}, classes, regions, {m: i for m, i in inventory.items() if i}, proofs)
+    import lbpbuild
+    t2_reports = {m: lbpbuild.load_report(m, "public") for m, i in inventory.items() if i}
+    figs = figures({p for p in kept_classes}, classes, regions, {m: i for m, i in inventory.items() if i}, proofs,
+                   t2_reports)
     (out / FIGURES).parent.mkdir(parents=True, exist_ok=True)
     (out / FIGURES).write_text(json.dumps(figs, indent=1, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
     print(f"public tree: {out}")
@@ -218,6 +265,10 @@ def build(out: Path, list_all: bool) -> int:
     for module, f in figs.items():
         print(f"  {module}: public T1 {f['public_t1_bytes']}/{f['public_scope_bytes']} B = {f['public_t1_percent']}% "
               f"(strict scope {f['strict_scope_bytes']} B)")
+        t2 = f["t2"]
+        print(f"  {module}: public T2 " + (f"{t2['public_t2_bytes']}/{f['public_scope_bytes']} B = {t2['public_t2_percent']}% "
+                                           f"(+{t2['public_t2_data_bytes']} data B; {t2['image_t2_percent']}% of the "
+                                           "identical image)" if isinstance(t2, dict) else t2))
     return 0
 
 

@@ -18,6 +18,10 @@ Interactive Entertainment or Media Molecule.
 - `symbols/`: the names this project gives to addresses in the executable (no code or data from the game).
 - `data/public-figures.json`: progress over the public scope (the game's code and the open-source libraries); the
   Sony code above stays in the strict 100% scope (`docs/COMPLETION.md`) but not in the public figure.
+- Whole-module build (tier T2, `tools/lbpbuild.py`, measured by the maintainers 2026-10-28; it reads the accepted
+  proofs, which stay private): the executable rebuilt from these sources plus scaffolding cut from the owner's own copy
+  is byte-identical to the original (SHA-256 equal); the published sources produce 393,372 code bytes of it, 13.752%
+  of the public scope (scaffolding never counts).
 
 ## Requirements
 
