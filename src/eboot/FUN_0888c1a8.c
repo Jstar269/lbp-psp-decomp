@@ -1,0 +1,10 @@
+/* LBPMATCH module=EBOOT.BIN start=0x0888c1a8 end=0x0888c1b4 symbol=FUN_0888c1a8 lang=c99 cc=gcc410-Os */
+/* Clone of src/eboot/FUN_08804764.c (lbpclone.py tag r-rd1a-b): addresses substituted; exact match verified; names and types await human review. */
+
+/* Thin wrapper: forwards fixed arguments (0, 0xffff) to FUN_0888c0d4 (a sibling wrapper passes 1 first). */
+extern void FUN_0888c0d4(int flag, unsigned int mask);
+
+void FUN_0888c1a8(void)
+{
+  FUN_0888c0d4(0, 0xffff);
+}

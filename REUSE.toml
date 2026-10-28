@@ -1,0 +1,308 @@
+version = 1
+SPDX-PackageName = "LittleBigPlanet (PSP) matching decompilation"
+
+# Licensing map (REUSE specification 3.x). The licence texts are in LICENSES/. See THIRD_PARTY.md. When several
+# annotations match a path, the LAST one in this file is the effective one, so the specific entries come after the
+# generic ones. `python tools/lbpreuse.py check` verifies the coverage.
+
+# The reconstructed code. The GPL grant covers only the project's own contributions: it grants no rights in the
+# original work of Sony Interactive Entertainment, Media Molecule or anyone else.
+[[annotations]]
+path = ["src/**", "wip/**", "symbols/**"]
+SPDX-FileCopyrightText = "2026 Jstar269 and contributors"
+SPDX-License-Identifier = "GPL-3.0-or-later"
+
+# Project-authored tools, documentation, headers, data and configuration.
+[[annotations]]
+path = [
+  "tools/**",
+  "toolchain/**",
+  "ghidra/**",
+  "data/**",
+  "include/**",
+  "docs/**",
+  "AGENTS.md",
+  "CONTRIBUTING.md",
+  "README.md",
+  "THIRD_PARTY.md",
+  "REUSE.toml",
+  "ORIGINS.json",
+  "lbp-config.example.json",
+  ".gitignore",
+  ".gitattributes",
+]
+SPDX-FileCopyrightText = "2026 Jstar269 and contributors"
+SPDX-License-Identifier = "GPL-3.0-or-later"
+
+# newlib's own licence list, byte for byte from the tarballs.
+[[annotations]]
+path = "third_party/**"
+precedence = "override"
+SPDX-FileCopyrightText = "Copyright (c) 1994-2005 Red Hat Incorporated and the other newlib contributors"
+SPDX-License-Identifier = "LicenseRef-Newlib-COPYING-NEWLIB"
+
+[[annotations]]
+path = "third_party/newlib/README.md"
+precedence = "override"
+SPDX-FileCopyrightText = "2026 Jstar269 and contributors"
+SPDX-License-Identifier = "GPL-3.0-or-later"
+
+# BEGIN generated newlib annotations (tools/lbpreuse.py generate --write); do not edit by hand
+# One annotation per distinct set of notices. The files are the upstream newlib files preprocessed with
+# their comments kept, so the licences of the notices inside them (and of the newlib headers they include)
+# apply; precedence = "override" makes these win over the generic src/** annotation above.
+
+[[annotations]]
+path = [
+  "src/eboot/_Balloc_08ba8c50.c",
+  "src/eboot/__mcmp_08ba85b8.c",
+]
+precedence = "override"
+SPDX-FileCopyrightText = [
+  "Copyright (c) 1989-2000 On-Line Applications Research Corporation (OAR)",
+  "Copyright (c) 1991 by AT&T",
+  "Copyright (c) 1993 Martin Birgmeier",
+]
+SPDX-License-Identifier = "LicenseRef-Newlib-Gay-AT-T AND LicenseRef-Newlib-OAR AND LicenseRef-Newlib-Birgmeier"
+
+[[annotations]]
+path = [
+  "src/eboot/isalnum_08b9dbb4.c",
+  "src/eboot/isalpha_08b9dbcc.c",
+  "src/eboot/isspace_08b9dbe4.c",
+]
+precedence = "override"
+SPDX-FileCopyrightText = [
+  "Copyright (c) 1994, 1997, 2001, 2002, 2003, 2004 Red Hat Incorporated",
+]
+SPDX-License-Identifier = "LicenseRef-Newlib-Red-Hat"
+
+[[annotations]]
+path = [
+  "src/eboot/__errno_08aca124.c",
+  "src/eboot/memchr_08b9e624.c",
+  "src/eboot/memcmp_08b9e714.c",
+  "src/eboot/strcat_08ba0be0.c",
+  "src/eboot/strchr_08ba0c84.c",
+  "src/eboot/strncat_08ba0ea4.c",
+  "src/eboot/strstr_08ba129c.c",
+]
+precedence = "override"
+SPDX-FileCopyrightText = [
+  "Copyright (c) 1993 Martin Birgmeier",
+  "Copyright (c) 1994, 1997, 2001, 2002, 2003, 2004, 2005 Red Hat Incorporated",
+]
+SPDX-License-Identifier = "LicenseRef-Newlib-Red-Hat AND LicenseRef-Newlib-Birgmeier"
+
+[[annotations]]
+path = [
+  "src/eboot/_init_signal_r_08ba0670.c",
+  "src/eboot/abort_08b9ca68.c",
+]
+precedence = "override"
+SPDX-FileCopyrightText = [
+  "Copyright (c) 1989-2000 On-Line Applications Research Corporation (OAR)",
+  "Copyright (c) 1993 Martin Birgmeier",
+  "Copyright (c) 1994, 1997, 2001, 2002, 2003, 2004, 2005 Red Hat Incorporated",
+]
+SPDX-License-Identifier = "LicenseRef-Newlib-Red-Hat AND LicenseRef-Newlib-OAR AND LicenseRef-Newlib-Birgmeier"
+
+[[annotations]]
+path = [
+  "src/eboot/fiprintf_08b9ce3c.c",
+  "src/eboot/putc_unlocked_08b9ce78.c",
+  "src/eboot/std_08b9cd58_08b9cd58.c",
+]
+precedence = "override"
+SPDX-FileCopyrightText = [
+  "Copyright (c) 1989-2000 On-Line Applications Research Corporation (OAR)",
+  "Copyright (c) 1990 The Regents of the University of California",
+  "Copyright (c) 1993 Martin Birgmeier",
+]
+SPDX-License-Identifier = "LicenseRef-Newlib-UCB-Advertising-Notice AND LicenseRef-Newlib-OAR AND LicenseRef-Newlib-Birgmeier"
+
+[[annotations]]
+path = [
+  "src/eboot/_mbrtowc_r_08ba7d88.c",
+  "src/eboot/mbrlen_08aa0a78.c",
+]
+precedence = "override"
+SPDX-FileCopyrightText = [
+  "Copyright (c) 1989-2000 On-Line Applications Research Corporation (OAR)",
+  "Copyright (c) 1990 The Regents of the University of California",
+  "Copyright (c) 1993 Martin Birgmeier",
+  "Copyright (c) 1994, 1997, 2001, 2002, 2003, 2004, 2005 Red Hat Incorporated",
+]
+SPDX-License-Identifier = "LicenseRef-Newlib-UCB-Advertising-Notice AND LicenseRef-Newlib-Red-Hat AND LicenseRef-Newlib-OAR AND LicenseRef-Newlib-Birgmeier"
+
+[[annotations]]
+path = [
+  "src/eboot/__strtok_r_08ba250c.c",
+]
+precedence = "override"
+SPDX-FileCopyrightText = [
+  "Copyright (c) 1988 Regents of the University of California",
+  "Copyright (c) 1993 Martin Birgmeier",
+]
+SPDX-License-Identifier = "LicenseRef-Newlib-UCB-BSD-3-Clause AND LicenseRef-Newlib-Birgmeier"
+
+[[annotations]]
+path = [
+  "src/eboot/__sprint_08ba2b4c.c",
+]
+precedence = "override"
+SPDX-FileCopyrightText = [
+  "Copyright (c) 1989-2000 On-Line Applications Research Corporation (OAR)",
+  "Copyright (c) 1990 The Regents of the University of California",
+  "Copyright (c) 1991 by AT&T",
+  "Copyright (c) 1993 Martin Birgmeier",
+]
+SPDX-License-Identifier = "LicenseRef-Newlib-UCB-BSD-4-Clause AND LicenseRef-Newlib-UCB-Advertising-Notice AND LicenseRef-Newlib-Gay-AT-T AND LicenseRef-Newlib-OAR AND LicenseRef-Newlib-Birgmeier"
+# END generated newlib annotations
+
+# BEGIN generated library annotations (tools/lbpreuse.py generate --write); do not edit by hand
+# zlib and GNU libstdc++/libsupc++ sources, by origin class (tools/lbporigin.py).
+
+# libstdc++
+[[annotations]]
+path = [
+  "src/eboot/FUN_08b88cb0.c",
+  "src/eboot/FUN_08b88f70.c",
+  "src/eboot/FUN_08b88fc8.c",
+  "src/eboot/FUN_08b89078.c",
+  "src/eboot/FUN_08b89080.c",
+  "src/eboot/FUN_08b898a0.c",
+  "src/eboot/FUN_08b89924.c",
+  "src/eboot/FUN_08b89984.c",
+  "src/eboot/FUN_08b89ee8.c",
+  "src/eboot/FUN_08b8a168.c",
+  "src/eboot/FUN_08b8aa38.c",
+  "src/eboot/FUN_08b8b220.c",
+  "src/eboot/FUN_08b8b274.c",
+  "src/eboot/FUN_08b8b30c.c",
+  "src/eboot/FUN_08b8b324.c",
+  "src/eboot/FUN_08b8b364.c",
+  "src/eboot/FUN_08b8b37c.c",
+  "src/eboot/FUN_08b8b3cc.c",
+  "src/eboot/FUN_08b8b6b8.c",
+  "src/eboot/FUN_08b8b6c4.c",
+  "src/eboot/FUN_08b8b734.c",
+  "src/eboot/FUN_08b8b78c.c",
+  "src/eboot/FUN_08b8b7dc.c",
+  "src/eboot/FUN_08b8b818.c",
+  "src/eboot/FUN_08b8b858.c",
+  "src/eboot/FUN_08b8bc84.c",
+  "src/eboot/FUN_08b8c398.c",
+  "src/eboot/FUN_08b8c3ac.c",
+  "src/eboot/FUN_08b8c3c0.c",
+  "src/eboot/FUN_08b8c3d4.c",
+  "src/eboot/FUN_08b8c3e8.c",
+  "src/eboot/FUN_08b8c4a0.c",
+  "src/eboot/FUN_08b8c4ac.c",
+  "src/eboot/FUN_08b8cc14.c",
+  "src/eboot/FUN_08b8ce38.c",
+  "src/eboot/FUN_08b8ce48.c",
+  "src/eboot/FUN_08b8ceac.c",
+  "src/eboot/FUN_08b8cff8.c",
+  "src/eboot/FUN_08b8d0b8.c",
+  "src/eboot/FUN_08b8d0ec.c",
+  "src/eboot/FUN_08b8e068.c",
+  "src/eboot/FUN_08b8e1a8.c",
+  "src/eboot/FUN_08b8e1b0.c",
+  "src/eboot/FUN_08b8e1b8.c",
+  "src/eboot/FUN_08b8e248.c",
+  "src/eboot/FUN_08b8e25c.c",
+  "src/eboot/FUN_08b8f3ec.c",
+  "src/eboot/FUN_08b8f6a4.c",
+  "src/eboot/FUN_08b8fb14.c",
+  "src/eboot/FUN_08b8ff10.c",
+  "src/eboot/FUN_08b90c84.c",
+  "src/eboot/FUN_08b9138c.c",
+  "src/eboot/FUN_08b94ae8.c",
+  "src/eboot/FUN_08b97cd0.c",
+  "src/eboot/FUN_08b97cd8.c",
+  "src/eboot/FUN_08b97ce0.c",
+  "src/eboot/FUN_08b97d88.c",
+  "src/eboot/FUN_08b97dbc.c",
+  "src/eboot/FUN_08b97ff8.c",
+  "src/eboot/FUN_08b98000.c",
+  "src/eboot/FUN_08b98008.c",
+  "src/eboot/FUN_08b9b2f0.c",
+  "src/eboot/FUN_08b9b324.c",
+  "src/eboot/FUN_08b9b65c.c",
+  "src/eboot/FUN_08b9be28.c",
+  "src/eboot/FUN_08b9bee0.c",
+  "src/eboot/FUN_08b9c060.c",
+  "src/eboot/compare_08b9b684.c",
+  "src/eboot/dtor_body_08b8809c.c",
+  "src/eboot/dtor_body_08b880e0.c",
+  "src/eboot/dtor_body_08b88124.c",
+  "src/eboot/dtor_body_08b88168.c",
+  "src/eboot/dtor_body_08b881ac.c",
+  "src/eboot/dtor_body_08b881f0.c",
+  "src/eboot/dtor_body_08b88234.c",
+  "src/eboot/dtor_body_08b8ce04.c",
+  "src/eboot/dtor_body_08b8df30.c",
+  "src/eboot/dtor_body_08b8e088.c",
+  "src/eboot/dtor_body_08b8e130.c",
+  "src/eboot/dtor_body_08b8e174.c",
+  "src/eboot/dtor_body_08b8e1d0.c",
+  "src/eboot/dtor_body_08b8e214.c",
+  "src/eboot/dtor_vptr_08b8cdc4.c",
+  "src/eboot/dtor_vptr_08b8cdd4.c",
+  "src/eboot/dtor_vptr_08b8e0e0.c",
+  "src/eboot/dtor_vptr_08b8e100.c",
+  "src/eboot/dtor_vptr_delete_08b8808c.c",
+  "src/eboot/dtor_vptr_delete_08b880d0.c",
+  "src/eboot/dtor_vptr_delete_08b88114.c",
+  "src/eboot/dtor_vptr_delete_08b88158.c",
+  "src/eboot/dtor_vptr_delete_08b8819c.c",
+  "src/eboot/dtor_vptr_delete_08b881e0.c",
+  "src/eboot/dtor_vptr_delete_08b88224.c",
+  "src/eboot/dtor_vptr_delete_08b8cde4.c",
+  "src/eboot/dtor_vptr_delete_08b8cdf4.c",
+  "src/eboot/dtor_vptr_delete_08b8df20.c",
+  "src/eboot/dtor_vptr_delete_08b8e078.c",
+  "src/eboot/dtor_vptr_delete_08b8e0f0.c",
+  "src/eboot/dtor_vptr_delete_08b8e110.c",
+  "src/eboot/dtor_vptr_delete_08b8e120.c",
+  "src/eboot/dtor_vptr_delete_08b8e164.c",
+  "src/eboot/dtor_vptr_delete_08b8e1c0.c",
+  "src/eboot/dtor_vptr_delete_08b8e204.c",
+  "wip/fam_08b883b0.cpp",
+  "wip/lane_08b8ba90.c",
+  "wip/lane_08b8bf24.c",
+  "wip/near_08b8dd54.c",
+  "wip/near_08b91284.c",
+]
+precedence = "override"
+SPDX-FileCopyrightText = [
+  "Copyright (C) 1997-2005 Free Software Foundation, Inc.",
+  "2026 Jstar269 and contributors",
+]
+SPDX-License-Identifier = "GPL-3.0-or-later"
+
+# zlib
+[[annotations]]
+path = [
+  "src/eboot/zlib_inflateEnd.c",
+  "src/eboot/zlib_inflateGetHeader.c",
+  "src/eboot/zlib_inflateInit2_.c",
+  "src/eboot/zlib_inflateInit_.c",
+  "src/eboot/zlib_inflatePrime.c",
+  "src/eboot/zlib_inflateReset.c",
+  "src/eboot/zlib_inflateSetDictionary.c",
+  "src/eboot/zlib_inflateSync.c",
+  "src/eboot/zlib_inflateSyncPoint.c",
+  "src/eboot/zlib_updatewindow.c",
+  "wip/inflateCopy_08ad56e0.c",
+  "wip/t/z_inflateCopy_gcc404xs-Os.c",
+  "wip/t/z_inflateSync_gcc404xs-Os.c",
+  "wip/t/zs2.c",
+]
+precedence = "override"
+SPDX-FileCopyrightText = [
+  "Copyright (C) 1995-2005 Jean-loup Gailly and Mark Adler",
+]
+SPDX-License-Identifier = "Zlib"
+# END generated library annotations

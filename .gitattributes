@@ -1,0 +1,2 @@
+# Keep every file byte-exact: review decisions and match records bind sha256 of the exact text.
+* -text

@@ -1,0 +1,81 @@
+SPDX-License-Identifier: GPL-3.0-or-later
+lbp-decomp ins-from-zero change for GCC 4.0.4 (after the pspdev patch and lbp-allegrex-tuning.diff): applies with
+`patch -p1` in gcc-4.0.4/. An SImode `and` with a constant mask that clears one contiguous run of bits and that
+andi cannot encode is emitted as `ins rd,$0,pos,len` (rd tied to the source), as Sony's compiler does.
+LBP_INS_CLEAR_LOW_ONLY 0 = any contiguous run (the measured, adopted variant; 1 = only runs starting at bit 0).
+--- a/gcc/config/mips/mips.h
++++ b/gcc/config/mips/mips.h
+@@ -1958,6 +1958,16 @@
+ 
+ #define SMALL_INT(X) SMALL_OPERAND (INTVAL (X))
+ #define SMALL_INT_UNSIGNED(X) SMALL_OPERAND_UNSIGNED (INTVAL (X))
++
++/* lbp ins-from-zero: the bits a mask clears, and whether they are one contiguous run that andi cannot encode. */
++#define LBP_INS_CLEAR_LOW_ONLY 0
++#define ALLEGREX_CLEAR_RUN(X) (~(unsigned HOST_WIDE_INT) (X) & 0xffffffff)
++#define ALLEGREX_CLEAR_LOWBIT(X) (ALLEGREX_CLEAR_RUN (X) & -ALLEGREX_CLEAR_RUN (X))
++#define ALLEGREX_CLEAR_MASK_P(X) \
++  (!SMALL_OPERAND_UNSIGNED (X) && ALLEGREX_CLEAR_RUN (X) != 0 \
++   && ((ALLEGREX_CLEAR_RUN (X) / ALLEGREX_CLEAR_LOWBIT (X)) \
++       & (ALLEGREX_CLEAR_RUN (X) / ALLEGREX_CLEAR_LOWBIT (X) + 1)) == 0 \
++   && (!LBP_INS_CLEAR_LOW_ONLY || (ALLEGREX_CLEAR_RUN (X) & 1)))
+ #define LUI_INT(X) LUI_OPERAND (INTVAL (X))
+ 
+ /* The letters I, J, K, L, M, N, O, and P in a register constraint
+--- a/gcc/config/mips/mips.md
++++ b/gcc/config/mips/mips.md
+@@ -2025,11 +2025,15 @@
+ (define_expand "and<mode>3"
+   [(set (match_operand:GPR 0 "register_operand")
+ 	(and:GPR (match_operand:GPR 1 "register_operand")
+-		 (match_operand:GPR 2 "uns_arith_operand")))]
++		 (match_operand:GPR 2 "and_operand")))]
+   ""
+ {
+   if (TARGET_MIPS16)
+     operands[2] = force_reg (<MODE>mode, operands[2]);
++  else if (GET_CODE (operands[2]) == CONST_INT
++	   && !uns_arith_operand (operands[2], <MODE>mode)
++	   && (<MODE>mode != SImode || !allegrex_clear_operand (operands[2], SImode)))
++    operands[2] = force_reg (<MODE>mode, operands[2]);
+ })
+ 
+ (define_insn "*and<mode>3"
+@@ -2043,6 +2047,22 @@
+   [(set_attr "type" "arith")
+    (set_attr "mode" "<MODE>")])
+ 
++;; lbp ins-from-zero (Allegrex): clear one contiguous run of bits in place.
++(define_insn "*andsi3_allegrex_clear"
++  [(set (match_operand:SI 0 "register_operand" "=d")
++	(and:SI (match_operand:SI 1 "register_operand" "0")
++		(match_operand:SI 2 "allegrex_clear_operand" "")))]
++  "!TARGET_MIPS16"
++{
++  unsigned HOST_WIDE_INT run = ALLEGREX_CLEAR_RUN (INTVAL (operands[2]));
++  unsigned HOST_WIDE_INT low = run & -run;
++  operands[3] = GEN_INT (exact_log2 (low));
++  operands[4] = GEN_INT (exact_log2 (run / low + 1));
++  return "ins\t%0,$0,%3,%4";
++}
++  [(set_attr "type" "arith")
++   (set_attr "mode" "SI")])
++
+ (define_insn "*and<mode>3_mips16"
+   [(set (match_operand:GPR 0 "register_operand" "=d")
+ 	(and:GPR (match_operand:GPR 1 "register_operand" "%0")
+--- a/gcc/config/mips/predicates.md
++++ b/gcc/config/mips/predicates.md
+@@ -206,3 +206,12 @@
+ (define_predicate "small_data_pattern"
+   (and (match_code "set,parallel,unspec,unspec_volatile,prefetch")
+        (match_test "mips_small_data_pattern_p (op)")))
++
++;; lbp ins-from-zero: a constant mask that clears one contiguous run of bits and that andi cannot encode.
++(define_predicate "allegrex_clear_operand"
++  (and (match_code "const_int")
++       (match_test "TARGET_ALLEGREX && ALLEGREX_CLEAR_MASK_P (INTVAL (op))")))
++
++(define_predicate "and_operand"
++  (ior (match_operand 0 "uns_arith_operand")
++       (match_operand 0 "allegrex_clear_operand")))

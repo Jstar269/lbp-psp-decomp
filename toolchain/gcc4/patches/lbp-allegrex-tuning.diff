@@ -1,0 +1,46 @@
+SPDX-License-Identifier: GPL-3.0-or-later
+lbp-decomp Allegrex tuning for GCC 4.0.x with the pspdev 2007 patch (65aaa94632): applies with `patch -p1` in
+gcc-4.0.2/ or gcc-4.0.4/ after that patch. Three measured changes (see README.md):
+  1. mips.md: `allegrex` appended to the cpu attribute (it must list enum processor_type; the pspdev patch omits
+     it, so no tune-specific description ever applied to -march=allegrex);
+  2. mips.h: TUNE_ALLEGREX gets the r4000/r6000 MEMORY_MOVE_COST (6) and BRANCH_COST (2);
+  3. mips.md: includes allegrex-sched.md (copied from patches/allegrex-sched.md) before generic.md.
+--- a/gcc/config/mips/mips.h
++++ b/gcc/config/mips/mips.h
+@@ -2631,7 +2631,7 @@
+ 
+ /* ??? Fix this to be right for the R8000.  */
+ #define MEMORY_MOVE_COST(MODE,CLASS,TO_P) \
+-  (((TUNE_MIPS4000 || TUNE_MIPS6000) ? 6 : 4) \
++  (((TUNE_MIPS4000 || TUNE_MIPS6000 || TUNE_ALLEGREX) ? 6 : 4) \
+    + memory_move_secondary_cost ((MODE), (CLASS), (TO_P)))
+ 
+ /* Define if copies to/from condition code registers should be avoided.
+@@ -2647,7 +2647,7 @@
+ /* ??? Fix this to be right for the R8000.  */
+ #define BRANCH_COST							\
+   ((! TARGET_MIPS16							\
+-    && (TUNE_MIPS4000 || TUNE_MIPS6000))				\
++    && (TUNE_MIPS4000 || TUNE_MIPS6000 || TUNE_ALLEGREX))				\
+    ? 2 : 1)
+ 
+ /* If defined, modifies the length assigned to instruction INSN as a
+--- a/gcc/config/mips/mips.md
++++ b/gcc/config/mips/mips.md
+@@ -267,7 +267,7 @@
+ ;; Attribute describing the processor.  This attribute must match exactly
+ ;; with the processor_type enumeration in mips.h.
+ (define_attr "cpu"
+-  "default,4kc,5kc,20kc,m4k,r3000,r3900,r6000,r4000,r4100,r4111,r4120,r4130,r4300,r4600,r4650,r5000,r5400,r5500,r7000,r8000,r9000,sb1,sr71000"
++  "default,4kc,5kc,20kc,m4k,r3000,r3900,r6000,r4000,r4100,r4111,r4120,r4130,r4300,r4600,r4650,r5000,r5400,r5500,r7000,r8000,r9000,sb1,sr71000,allegrex"
+   (const (symbol_ref "mips_tune")))
+ 
+ ;; The type of hardware hazard associated with this instruction.
+@@ -515,6 +515,7 @@
+ (include "9000.md")
+ (include "sb1.md")
+ (include "sr71k.md")
++(include "allegrex-sched.md")
+ (include "generic.md")
+ 
+ ;;

@@ -1,0 +1,18 @@
+{
+ "EBOOT.BIN": {
+  "code_bytes": 3827976,
+  "code_bytes_by_region_class": {
+   "game": 2774952,
+   "libstdc++": 84292,
+   "sony-sdk": 961772,
+   "startup": 1244,
+   "unattributed": 5716
+  },
+  "public_scope_bytes": 2860396,
+  "public_t1_bytes": 393372,
+  "public_t1_percent": 13.752,
+  "strict_scope_bytes": 3827976,
+  "t2": "not measured (no whole-module build yet)",
+  "t3": "not measured"
+ }
+}

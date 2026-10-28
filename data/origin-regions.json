@@ -1,0 +1,16 @@
+{
+ "about": "Where LittleBigPlanet's EBOOT.BIN code came from, by address (half-open [start, end)). Read by tools/lbporigin.py, which gives each source the class of its region unless its own note proves an open-source library origin. Measured 2026-10-28 from the string references (tools/lbpstrings.py) and call targets (tools/lbpdis.py) of every function. The static ELF keeps link order: Sony crt0 + GCC crtbegin, the game's objects, then the libraries.",
+ "module": "EBOOT.BIN",
+ "regions": [
+  {"start": "0x08804000", "end": "0x088044e8", "class": "startup",
+   "evidence": "crti _init (0x08804000), GCC crtbegin __do_global_dtors_aux / frame_dummy (0x08804030, 0x088040b4), Sony crt0 (0x08804114 sets the compiled SDK version 0x05050010; 0x08804228 calls _init, main 0x088048a8, exit), crt0 helper 0x088044b8"},
+  {"start": "0x088044e8", "end": "0x08aa9c90", "class": "game",
+   "evidence": "the game's objects: C++ static initialisers, asset paths (meshes/, textures/, movies/), the game's engine namespaces Gk::, Ik::, Lfc:: up to Ik::MipMap::Swizzle (0x08aa9ab0-0x08aa9c90); no library string (FIOS, SCREAM, snd_stream, SceRT, rt_cert, basic_string) is referenced below 0x08aa9000"},
+  {"start": "0x08aa9c90", "end": "0x08aab2e4", "class": "unattributed",
+   "evidence": "between the last game-string function and the first FIOS function: small wrappers that call the thread code at 0x08ad2810/0x08ad3088 and are called from game code; not attributed yet"},
+  {"start": "0x08aab2e4", "end": "0x08bab000", "class": "sony-sdk",
+   "evidence": "libraries after the game objects: Sony FIOS (FIOSInit 0x08aab658, pspmedia), Sony SCREAM audio (c)2006 and snd_stream, WWS scea_shared pthread, SceRT 3.04 (Dme, rt_cert, rt_crypt, rt_upnp, rtPspnet), the SNC-built library 0x08b15000-0x08b52d00, GNU libstdc++/libsupc++, newlib, libgcc, crtend. Open-source code inside this range is published only when its source proves it (note line), or by the libstdc++ region below"},
+  {"start": "0x08b88058", "end": "0x08b9c99c", "class": "libstdc++",
+   "evidence": "the only range with .eh_frame FDEs (the game is -fno-exceptions; Sony's C libraries have none): GNU libstdc++/libsupc++ objects (basic_string members, __cxa_*), GPL with the GCC runtime exception"}
+ ]
+}

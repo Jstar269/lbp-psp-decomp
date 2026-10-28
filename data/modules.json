@@ -1,0 +1,56 @@
+{
+  "schema": "lbp-decomp.modules.v1",
+  "title": "LittleBigPlanet",
+  "title_id": "UCUS98744",
+  "region": "NA",
+  "disc_version": "2.00",
+  "modules": [
+    {
+      "name": "EBOOT.BIN",
+      "src_dir": "eboot",
+      "kind": "game",
+      "origin": "PSP_GAME/SYSDIR/EBOOT.BIN",
+      "description": "the decrypted game executable (static ELF, loaded at 0x08804000; BOOT.BIN on the disc is blanked)",
+      "sha256": "391dbfa87527fcbc7e217564ed594449fc78f870bd3ac4bb37c47dd2a61c76b0",
+      "size": 4085872,
+      "load_segments": [
+        {
+          "flags": 7,
+          "start": 142622720,
+          "file_offset": 4096,
+          "file_end": 4084628,
+          "memory_end": 146887608
+        }
+      ],
+      "functions_file": "data/functions-EBOOT.BIN.txt",
+      "function_count": 15562
+    },
+    {
+      "name": "pspnet_ap_dialog_dummy.prx",
+      "src_dir": "apdialog",
+      "kind": "sony-prx",
+      "origin": "PSP_GAME/USRDIR/modules/prx/pspnet_ap_dialog_dummy.prx",
+      "description": "Sony system-library module sceNetApDialogDummy_Library, shipped on the disc",
+      "sha256": "2c5eefbe42f2a0214f95dfa0cdebc682fbb8fb4278b5d081e457ffa04c73de92",
+      "size": 2522,
+      "load_segments": [
+        {
+          "flags": 5,
+          "start": 0,
+          "file_offset": 160,
+          "file_end": 2192,
+          "memory_end": 2032
+        },
+        {
+          "flags": 6,
+          "start": 2032,
+          "file_offset": 2192,
+          "file_end": 2200,
+          "memory_end": 2064
+        }
+      ],
+      "functions_file": "data/functions-pspnet_ap_dialog_dummy.prx.txt",
+      "function_count": 21
+    }
+  ]
+}
