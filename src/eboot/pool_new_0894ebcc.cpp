@@ -1,0 +1,44 @@
+/* LBPMATCH module=EBOOT.BIN start=0x0894ebcc end=0x0894eca0 symbol=FUN_0894ebcc lang=c++ */
+/* Clone of src/eboot/pool_new_08905138.cpp (lbpclone.py tag c18): addresses substituted; exact match verified; names and types await human review. */
+/* Hand-written reconstruction from the disassembly (lane lbp11c, Claude Sonnet 5.5); exact match verified; names and types await human review. */
+inline void *operator new(unsigned, void *p) throw() { return p; }
+struct Mutex { int a; };
+extern Mutex DAT_08bef8f4;
+extern "C" void FUN_08ad3088(void *);
+extern "C" void FUN_08ad2810(void *);
+extern "C" void *FUN_08adb810(unsigned size, unsigned align, int a, int b);
+extern "C" void FUN_0894eb50(void *o);
+inline void *operator new(unsigned size, unsigned align, int a, int b) { return FUN_08adb810(size, align, a, b); }
+struct Obj {
+    char pad[40];
+    Obj() { FUN_0894eb50(this); }
+};
+struct Pool { Obj *base; Obj **stack; int cap; int top; int heap_count; };
+extern Pool DAT_08beda68;
+struct Handle {
+    Obj *p;
+    Handle() {}
+    Handle(const Handle &);
+};
+inline Obj *make()
+{
+    Obj *o;
+    if (DAT_08beda68.top < DAT_08beda68.cap) {
+        o = new (DAT_08beda68.stack[DAT_08beda68.top++]) Obj;
+    } else {
+        DAT_08beda68.heap_count++;
+        o = new (16, 0, 0) Obj;
+    }
+    return o;
+}
+extern "C" Handle FUN_0894ebcc()
+{
+    Handle h;
+    FUN_08ad3088(&DAT_08bef8f4);
+    FUN_08ad3088(&DAT_08bef8f4);
+    Obj *o = make();
+    FUN_08ad2810(&DAT_08bef8f4);
+    h.p = o;
+    FUN_08ad2810(&DAT_08bef8f4);
+    return h;
+}
