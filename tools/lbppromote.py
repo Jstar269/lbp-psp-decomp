@@ -260,7 +260,7 @@ class Run:
         c.header = h
 
     def build_dir(self, c: Candidate) -> Path:
-        return self.dir / "match" / c.header["module"] / f"{c.path.resolve().parent.name}__{c.path.stem}"
+        return self.dir / "match" / c.header["module"] / M.build_key(c.path)
 
     # -- 2. the matcher
     def run_matcher(self, cands: list[Candidate]) -> dict[str, dict]:

@@ -318,7 +318,7 @@ def main() -> int:
             if r["status"] not in ("MISSING_SYMBOLS", "UNPLACED_SECTION"):
                 continue
             hdr = M.parse_header(out)
-            build = M.ROOT / "build" / hdr["module"] / f"{out.resolve().parent.name}__{out.stem}"
+            build = M.ROOT / "build" / hdr["module"] / M.build_key(out)
             obj = (build / "obj.o").read_bytes() if (build / "obj.o").exists() else None
             if obj is None:
                 continue
@@ -351,7 +351,7 @@ def main() -> int:
     # commit the pending names used by EXACT sources (their exact bytes prove the address)
     for h, c, out, identity in exact.values():
         hdr = M.parse_header(out)
-        build = M.ROOT / "build" / hdr["module"] / f"{out.resolve().parent.name}__{out.stem}"
+        build = M.ROOT / "build" / hdr["module"] / M.build_key(out)
         obj = (build / "obj.o").read_bytes()
         used = {n for n, v, s, i, sh in M.elf_symbols(obj) if sh == 0 and n}
         syms = M.load_symbols(hdr["module"])

@@ -187,7 +187,7 @@ def main() -> int:
             out.write_text(head + "\n" + note + rest, encoding="utf-8", newline="\n")
             accepted += 1
             accepted_bytes += targets[t_start][0] - t_start
-            linked = M.ROOT / "build" / args.module / f"{cand.parent.name}__{cand.stem}" / "syms.ld"
+            linked = M.ROOT / "build" / args.module / M.build_key(cand) / "syms.ld"
             used = set(re.findall(r"^(\S+) = ", linked.read_text(encoding="utf-8"), re.M)) if linked.exists() else set()
             for symbol, address in owned.get(cand, {}).items():
                 if symbol in used and symbol in extra and symbol not in committed and target_symbols.get(symbol) != address:

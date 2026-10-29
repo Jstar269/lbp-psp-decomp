@@ -22,7 +22,8 @@ every change.
   batches for matching agents (`lbpqueue`) are run deliberately by whoever runs the campaign, not casually while
   matching a function.
 - Keep scratch work out of the tracked tree: use `try/<your-name>/` (gitignored). Build products go to
-  `build/<module>/<dir>__<stem>`, so use a distinct directory name to avoid colliding with someone else's run.
+  `build/<module>/<dir>__<stem>__<digest>` (`tools/lbpmatch.py` `build_key`: the digest comes from the source's path,
+  so equally named files in different directories never share build products).
 - Do not search recursively (`grep -r`) outside `src/`, `wip/`, `docs/`, `symbols/`, `include/` and your own `try/`
   directory. The campaign directory and `build/` can hold gigabytes.
 

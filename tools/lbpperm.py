@@ -441,7 +441,7 @@ def align_score(row: dict, theirs: list[int]) -> int:
     if row["status"] != "MISMATCH":
         return 10_000
     src = M.ROOT / row["source"]
-    text = M.ROOT / "build" / row["module"] / f"{src.parent.name}__{src.stem}" / "text.bin"
+    text = M.ROOT / "build" / row["module"] / M.build_key(src) / "text.bin"
     if not text.exists():
         return 10_000
     raw = text.read_bytes()

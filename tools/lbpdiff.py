@@ -25,7 +25,7 @@ def main() -> int:
     for arg in sys.argv[1:]:
         src = Path(arg).resolve()
         h = M.parse_header(src)
-        out = M.ROOT / "build" / h["module"] / f"{src.parent.name}__{src.stem}"
+        out = M.ROOT / "build" / h["module"] / M.build_key(src)
         cache: dict = {}
         data, seg = M.module_bytes(cache, h["module"])
         off = seg["file_offset"] + h["start"] - seg["start"]

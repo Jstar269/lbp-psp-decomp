@@ -798,7 +798,7 @@ def run_match(paths: list[str], build_root: Path, parallel: int) -> dict[str, di
 
 def match_dir(build_root: Path, module: str, path: str) -> Path:
     p = ROOT / path
-    return build_root / module / f"{p.parent.name}__{p.stem}"
+    return build_root / module / M.build_key(p)
 
 
 @contextlib.contextmanager

@@ -141,5 +141,34 @@ class LinkonceData(unittest.TestCase):
         self.assertIn("'q = 0x...;'", why)
 
 
+class BuildKey(unittest.TestCase):
+    def test_same_name_in_different_trees_gets_different_keys(self) -> None:
+        # the collision: try/gen-a1/v0/FUN_x.c and try/gen-a2/v0/FUN_x.c shared build/<module>/v0__FUN_x
+        a = M.ROOT / "try" / "gen-a1" / "v0" / "FUN_08804000.c"
+        b = M.ROOT / "try" / "gen-a2" / "v0" / "FUN_08804000.c"
+        self.assertNotEqual(M.build_key(a), M.build_key(b))
+        self.assertTrue(M.build_key(a).startswith("v0__FUN_08804000__"))
+
+    def test_key_is_stable_and_relative_to_the_checkout(self) -> None:
+        p = M.ROOT / "src" / "eboot" / "FUN_08804000.c"
+        self.assertEqual(M.build_key(p), M.build_key(Path(str(p))))
+        # inside the checkout the digest is of the relative path, so a lane (its own ROOT) keys the file the same way
+        ident = __import__("os").path.normcase("src/eboot/FUN_08804000.c")   # case-folded (and \ on Windows)
+        digest = __import__("hashlib").sha1(ident.encode("utf-8")).hexdigest()[:10]
+        self.assertEqual(M.build_key(p), f"eboot__FUN_08804000__{digest}")
+
+    def test_outside_the_checkout_the_absolute_path_decides(self) -> None:
+        with tempfile.TemporaryDirectory() as d:
+            a, b = Path(d) / "x" / "v0" / "f.c", Path(d) / "y" / "v0" / "f.c"
+            self.assertNotEqual(M.build_key(a), M.build_key(b))
+
+    def test_no_tool_builds_its_own_key(self) -> None:
+        for f in sorted(Path(M.__file__).resolve().parent.glob("lbp*.py")):
+            text = f.read_text(encoding="utf-8")
+            if f.name == "lbpmatch.py":
+                text = text.replace('return f"{p.parent.name}__{p.stem}__{digest}"', "")
+            self.assertNotRegex(text, r"parent\.name\}__\{", f"{f.name} builds a build-dir key; use lbpmatch.build_key")
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -830,7 +830,7 @@ def run_batch(gen: Path, files: list, parallel: int, label: str) -> dict:
 
 
 def build_dir(p: Path, module: str) -> Path:
-    return M.ROOT / "build" / module / f"{p.resolve().parent.name}__{p.stem}"
+    return M.ROOT / "build" / module / M.build_key(p)
 
 
 def value_used(body: str, callee: str) -> bool:

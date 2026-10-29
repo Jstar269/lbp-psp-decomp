@@ -10,6 +10,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import lbpgate as G
 
+# idioms a source may carry in src/ (each named by a project rule; anything else is a new idiom to review)
+KNOWN_IDIOMS = {"vfpu-inline-asm"}   # owner decision 2026-10-27: VFPU-only inline asm under `asm=vfpu`
+
 
 def kinds(text: str, header: dict | None = None, tree: str = "src") -> set[str]:
     return {f.kind for f in G.check_text(text, header, tree)}
@@ -106,7 +109,7 @@ class WiringTests(unittest.TestCase):
                 found = G.check_file(p, root)
                 if G.refusals(found):
                     refused_files.append(p.name)
-                if found:
+                if any(f.kind not in KNOWN_IDIOMS for f in found):
                     idioms.append(p.name)
         self.assertEqual(refused_files, [])
         self.assertEqual(sorted(idioms), [])

@@ -3,7 +3,7 @@
 
     python tools/lbpcat.py try/gen-<tag> [--variant v0] [--examples 3]
 
-Reads each MISMATCH candidate's linked bytes (build/<module>/<variant>__<name>/text.bin) and the retail
+Reads each MISMATCH candidate's linked bytes (build/<module>/<lbpmatch.build_key>/text.bin) and the retail
 bytes (target.bin, written by lbpmatch.py on a mismatch), and assigns the first matching class:
 
   frame        the stack adjustment (first instruction) differs
@@ -23,6 +23,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import lbpmatch as M  # noqa: E402
 import lbpproject as P  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -80,7 +81,7 @@ def main() -> int:
         source = ROOT / row["source"]
         if row["status"] != "MISMATCH" or source.parent.name != args.variant or row["start"] in exact:
             continue
-        out = ROOT / "build" / args.module / f"{source.parent.name}__{source.stem}"
+        out = ROOT / "build" / args.module / M.build_key(source)
         if not (out / "text.bin").exists() or not (out / "target.bin").exists():
             continue
         theirs = words((out / "target.bin").read_bytes())
