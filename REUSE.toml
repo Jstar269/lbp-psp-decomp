@@ -270,13 +270,18 @@ path = [
   "src/eboot/dtor_vptr_delete_08b8e1c0.c",
   "src/eboot/dtor_vptr_delete_08b8e204.c",
   "src/eboot/near_08b912fc.c",
+  "src/eboot/vcall_out_08b8d47c.c",
   "wip/array_push_08b8f24c.c",
   "wip/fam_08b883b0.cpp",
   "wip/guard_acquire_08b8dfd8.cpp",
   "wip/lane_08b8ba90.c",
   "wip/lane_08b8bf24.c",
+  "wip/lane_08b8f288.c",
   "wip/near_08b8dd54.c",
   "wip/near_08b91284.c",
+  "wip/wrap_strlen_a_08b8a174.c",
+  "wip/wrap_strlen_b_08b8b620.c",
+  "wip/write_08b943a4.c",
 ]
 precedence = "override"
 SPDX-FileCopyrightText = [
