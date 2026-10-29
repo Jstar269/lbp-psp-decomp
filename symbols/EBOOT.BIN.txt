@@ -387,3 +387,4 @@ _malloc_r = 0x08b9de30;   # newlib 1.14.0 dlmalloc mALLOc: request2size (+19, lo
 _ZZ9game_heapvE4heap = 0x08be84a0;   # the game heap pointer (DAT_08be84a0) as the local static of an inline accessor: weak in GCC 4.0, placed by lbpmatch's linkonce rule; src/eboot/map_insert_08805418.cpp
 zcalloc = 0x08ab7da4;   # zlib zutil.c zcalloc: malloc(items * size) (0x08b9ddd8); default zalloc stored by inflateInit2_/inflateInit_
 zcfree = 0x08ab7dc8;   # zlib zutil.c zcfree: free(ptr) (0x08b9de04); default zfree stored by inflateInit2_/inflateInit_
+_ZN5ValueC1ERKS_ = 0x088ae998;   # copy constructor of the 8-byte value placement-new-ed by FUN_088afc3c (lane lbp4b) [lane lbp4b]
