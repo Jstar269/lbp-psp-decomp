@@ -218,6 +218,22 @@ now `~/lbp-gcc4/psp-gcc-4.0.4x` (profile names unchanged; provenance in PROVENAN
 0x08ad59dc is EXACT from the stock zlib 1.2.3 source (`state->bits -= state->bits & 7`), 9 words off before.
 Results: `try/cceval/results/gcc404{x,y,z}s-Os-ins.json`.
 
+## Unaligned word access (assembler option `-mulsw`, adopted 2026-10-29)
+
+Retail game code has unaligned word loads and stores (`lwl`/`lwr`, `swl`/`swr`: packed struct members, `memcpy` of
+unaligned blocks, libgcc's unwinder): 288 functions without a source contain them. GCC 4.0.4 emits them, but the
+Sony kit assembler (binutils 2.14+allegrex-2.2.1-psp-1.3.1, behind the `sony-as` wrapper) rejected every one with
+"opcode not supported on this processor: allegrex (mips2)". The opcode table is not the cause (`lwl` has the same
+ISA I membership as `lw`). In `mips_ip`, a flag rejects exactly these four mnemonics when the CPU is `allegrex` (and
+`allegrex31`). The assembler's own option pair `-mulsw` / `-mno-ulsw` (not in `--help`) clears or sets the flag,
+and `-mno-ulsw` is the default. The `allegrex2`/`allegrex3` CPUs accept the four but reject `ext`/`ins`, so no
+`-march` value fits LBP's code. With `-mulsw` the assembler emits the four with retail's encodings and keeps every
+Allegrex instruction.
+
+The GCC 4 profiles that assemble with `sony-as` (all except `gcc432-*`, which uses the pspdev assembler) now pass
+`-Wa,-mulsw`. migrate-toolchain re-proved all 5,490 accepted proofs EXACT under it (no output changed: a source
+that held one of the four could not assemble before).
+
 ## Findings log
 
 Append one dated line per verified finding, naming the function address and the evidence.

@@ -28,9 +28,10 @@ Kinds (each ranks the functions that are not covered by src/, not reserved and n
 
 Flags from the retail words (for the lane and the ranking): `ins_zero` counts `ins rt,$zero,pos,n` (bit-field stores
 of zero and contiguous clear masks such as `x & ~7`; the primary compiler emits both since the ins-from-zero change of
-2026-10-28, docs/TOOLCHAIN.md), `vfpu` counts VFPU instructions (inline VFPU asm, asm=vfpu rules), `snc` marks the
-SNC-built library (cc_hint snc127-O2; try/snc-functions.txt). VFPU functions sort last; SNC functions only with
---include-snc.
+2026-10-28, docs/TOOLCHAIN.md), `vfpu` counts VFPU instructions (inline VFPU asm, asm=vfpu rules), `unaligned`
+counts lwl/lwr/swl/swr (assembled since the -mulsw change of 2026-10-29), `snc` marks the SNC-built library (cc_hint
+snc127-O2; try/snc-functions.txt). VFPU functions sort last; SNC functions only with --include-snc. `--flag NAME`
+keeps only functions with that flag, and offers attempted ones again (lanes skipped them before the change).
 
 Reserved / attempted (so batches made at different times stay disjoint): every address of a batch under
 try/agent-queue/ that no lane took yet, and of a lane under ext_root that is not harvested (no try/harvest-<lane>/),
@@ -59,15 +60,17 @@ GHIDRA = M.ROOT / "ghidra" / "out"
 NEAR_RATIO = 0.35
 LIBRARY_NAME = re.compile(r"^(?:_Z|__|_[a-z]|inflate|deflate|adler32|crc32|zcalloc|zcfree|mem|str|mb|wc|_?[a-z]+_r$)")
 VFPU_OPS = {0x18, 0x19, 0x1B, 0x32, 0x34, 0x35, 0x36, 0x37, 0x3A, 0x3C, 0x3D, 0x3E, 0x3F}
+UNALIGNED_OPS = {0x22, 0x26, 0x2A, 0x2E}
 PROGRESS = re.compile(r"^\s*(0x[0-9A-Fa-f]{6,8})\s+(EXACT|NEAR|SKIP)\b")
 
 
 def flags(ws: list[int]) -> dict:
     """ins_zero: `ins rt,$zero,pos,n` (SPECIAL3 0x1f, function 0x04, rs = $zero); vfpu: VFPU opcodes and COP2 moves
-    (mfv/mtv/bvf, opcode 0x12)."""
+    (mfv/mtv/bvf, opcode 0x12); unaligned: lwl/lwr/swl/swr (opcodes 0x22, 0x26, 0x2a, 0x2e)."""
     ins0 = sum(1 for w in ws if w >> 26 == 0x1F and w & 0x3F == 0x04 and (w >> 21) & 31 == 0)
     vfpu = sum(1 for w in ws if w >> 26 in VFPU_OPS or w >> 26 == 0x12)
-    return {"ins_zero": ins0, "vfpu": vfpu}
+    unaligned = sum(1 for w in ws if w >> 26 in UNALIGNED_OPS)
+    return {"ins_zero": ins0, "vfpu": vfpu, "unaligned": unaligned}
 
 
 def best_generated(root: Path) -> dict[int, dict]:
@@ -255,11 +258,15 @@ def rank(ctx: dict, module: str, kind: str, args) -> list[int]:
     funcs, fam = ctx["funcs"], ctx["family_of"]
     covered_fam = {s for s in fam if any(m in ctx["have"] for m in fam[s])}
 
-    blocked = ctx["reserved"] | ctx["attempted"] | set(args.exclude)
+    # --flag: only functions whose retail words carry that flag; attempted ones are offered again, because a flag
+    # filter follows a toolchain change for exactly those instructions (lanes skipped them before)
+    blocked = ctx["reserved"] | (set() if args.flag else ctx["attempted"]) | set(args.exclude)
 
     def open_(s: int) -> bool:
         f = funcs[s]
         if s in ctx["have"] or any(m in blocked for m in fam.get(s, [s])):   # a family is offered once
+            return False
+        if args.flag and not f["flags"].get(args.flag):
             return False
         if not args.min_size <= f["size"] <= args.max_size:
             return False
@@ -366,6 +373,8 @@ def main() -> int:
     ap.add_argument("--min-size", type=int, default=32)
     ap.add_argument("--max-size", type=int, default=1024)
     ap.add_argument("--include-snc", action="store_true")
+    ap.add_argument("--flag", choices=("ins_zero", "vfpu", "unaligned"),
+                    help="only functions with this retail flag, attempted ones included")
     ap.add_argument("--exclude", type=lambda v: [int(a, 16) for a in v.split(",") if a], default=[],
                     help="addresses never to offer (e.g. matched but not installed yet)")
     ap.add_argument("--dry-run", action="store_true")

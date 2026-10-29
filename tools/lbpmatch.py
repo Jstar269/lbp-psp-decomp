@@ -151,8 +151,11 @@ def gcc_profiles() -> dict:
               "402x": ("4.0.2x", " -mpreferred-stack-boundary=4"),
               # gcc404x-*: PRIMARY: the gcc402x changes on GCC 4.0.4 (C++ static-init test order as retail; 2026-10-27)
               "404x": ("4.0.4x", " -mpreferred-stack-boundary=4")}
+        # -mulsw: the Sony assembler rejects lwl/lwr/swl/swr on -march=allegrex unless given its own -mulsw
+        # (unaligned load/store word) option; retail LBP has them (docs/TOOLCHAIN.md, "Unaligned word access")
+        ulsw = {v: "" if v == "432" else " -Wa,-mulsw" for v in g4}
         _gcc_profiles.update({f"gcc{v}-{o}": {"driver": f"{gcc4_home()}/psp-gcc-{g4[v][0]}/bin/psp-gcc", "B": None,
-                                               "flags": f"-{o} -G0 -fno-merge-constants{g4[v][1]}"}
+                                               "flags": f"-{o} -G0 -fno-merge-constants{g4[v][1]}{ulsw[v]}"}
                               for v in g4 for o in ("O0", "O1", "O2", "O3", "Os")})
         _gcc_profiles["gcc404xi-Os"] = dict(_gcc_profiles["gcc404x-Os"],
                                             flags=_gcc_profiles["gcc404x-Os"]["flags"] + " --param max-inline-insns-single=50")
